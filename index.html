@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hostel Complaint Management System</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ================== NAVBAR ================== -->
+<nav class="navbar">
+  <a class="navbar-brand" href="#" onclick="showPage('home')">
+    <div class="navbar-logo">🏠</div>
+    <div>
+      <div class="navbar-title">HostelCare</div>
+      <div class="navbar-subtitle">Complaint Management System</div>
+    </div>
+  </a>
+
+  <ul class="navbar-nav">
+    <li><button id="nav-home" class="active" onclick="showPage('home')"><i class="fas fa-home"></i> Home</button></li>
+    <li><button id="nav-student" onclick="showPage('student')"><i class="fas fa-edit"></i> Register Complaint</button></li>
+    <li><button id="nav-track" onclick="showPage('track')"><i class="fas fa-search"></i> Track Complaint</button></li>
+    <li><button id="nav-warden" onclick="showPage('warden')"><i class="fas fa-clipboard-list"></i> Warden Panel</button></li>
+    <li><button id="nav-admin" onclick="showPage('admin')"><i class="fas fa-chart-bar"></i> Admin Dashboard</button></li>
+  </ul>
+
+  <button class="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ================== PAGE: HOME ================== -->
+<div id="page-home" class="page active">
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <div class="hero-badge">🏠 Hostel Complaint Portal • Online 24/7</div>
+    <h1>Hostel Complaint<br>Management System</h1>
+    <p>Submit, track, and resolve hostel complaints quickly and efficiently. Stay informed at every step of the process.</p>
+
+    <div class="hero-cards">
+      <a class="hero-card" href="#" onclick="showPage('student'); return false;">
+        <div class="hero-card-icon student">📝</div>
+        <h3>Register Complaint</h3>
+        <p>Submit a new complaint with images</p>
+      </a>
+      <a class="hero-card" href="#" onclick="showPage('track'); return false;">
+        <div class="hero-card-icon track">🔍</div>
+        <h3>Track Status</h3>
+        <p>Check your complaint progress</p>
+      </a>
+      <a class="hero-card" href="#" onclick="showPage('warden'); return false;">
+        <div class="hero-card-icon warden">🛡️</div>
+        <h3>Warden Panel</h3>
+        <p>Manage and assign complaints</p>
+      </a>
+      <a class="hero-card" href="#" onclick="showPage('admin'); return false;">
+        <div class="hero-card-icon admin">📊</div>
+        <h3>Admin Dashboard</h3>
+        <p>Analytics & Excel export</p>
+      </a>
+    </div>
+  </div>
+
+  <!-- Live Stats Banner -->
+  <div class="stats-banner">
+    <div class="stat-item">
+      <span class="stat-number" id="stat-total">0</span>
+      <span class="stat-label">Total Complaints</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number" style="color:#f59e0b;" id="stat-pending">0</span>
+      <span class="stat-label">Pending</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number" style="color:#8b5cf6;" id="stat-progress">0</span>
+      <span class="stat-label">In Progress</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number" style="color:#16a34a;" id="stat-resolved">0</span>
+      <span class="stat-label">Resolved</span>
+    </div>
+  </div>
+
+  <!-- How It Works -->
+  <div class="container section">
+    <div class="section-header">
+      <h2 class="section-title">How It <span>Works</span></h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:20px;">
+      <div class="card" style="text-align:center;">
+        <div style="font-size:44px; margin-bottom:12px;">📝</div>
+        <div style="width:30px; height:30px; border-radius:50%; background:var(--primary); color:white; font-weight:700; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:14px;">1</div>
+        <h3 style="font-size:15px; font-weight:700; margin-bottom:8px;">Submit Complaint</h3>
+        <p style="font-size:13px; color:var(--gray-500);">Fill the complaint form with your details and describe the issue. You can also upload supporting images.</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:44px; margin-bottom:12px;">🎫</div>
+        <div style="width:30px; height:30px; border-radius:50%; background:var(--primary); color:white; font-weight:700; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:14px;">2</div>
+        <h3 style="font-size:15px; font-weight:700; margin-bottom:8px;">Get Complaint ID</h3>
+        <p style="font-size:13px; color:var(--gray-500);">A unique complaint ID is generated instantly. Save it to track your complaint status anytime.</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:44px; margin-bottom:12px;">🔄</div>
+        <div style="width:30px; height:30px; border-radius:50%; background:var(--primary); color:white; font-weight:700; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:14px;">3</div>
+        <h3 style="font-size:15px; font-weight:700; margin-bottom:8px;">Warden Reviews</h3>
+        <p style="font-size:13px; color:var(--gray-500);">The hostel warden reviews your complaint and assigns maintenance staff to resolve the issue quickly.</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:44px; margin-bottom:12px;">✅</div>
+        <div style="width:30px; height:30px; border-radius:50%; background:var(--success); color:white; font-weight:700; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:14px;">4</div>
+        <h3 style="font-size:15px; font-weight:700; margin-bottom:8px;">Issue Resolved</h3>
+        <p style="font-size:13px; color:var(--gray-500);">Once resolved, the status updates to "Resolved". Track progress at every stage using your complaint ID.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Complaint Categories -->
+  <div style="background:white; padding:40px 0; border-top:1px solid var(--gray-100);">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Complaint <span>Categories</span></h2>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:14px;">
+        <div class="card" style="text-align:center; padding:20px 12px; cursor:pointer;" onclick="showPage('student')">
+          <div style="font-size:32px; margin-bottom:8px;">⚡</div>
+          <div style="font-size:13px; font-weight:600; color:var(--dark);">Electrical</div>
+          <div style="font-size:11px; color:var(--gray-400); margin-top:2px;">Lights, fans, switches</div>
+        </div>
+        <div class="card" style="text-align:center; padding:20px 12px; cursor:pointer;" onclick="showPage('student')">
+          <div style="font-size:32px; margin-bottom:8px;">🚿</div>
+          <div style="font-size:13px; font-weight:600; color:var(--dark);">Plumbing</div>
+          <div style="font-size:11px; color:var(--gray-400); margin-top:2px;">Leaks, taps, drainage</div>
+        </div>
+        <div class="card" style="text-align:center; padding:20px 12px; cursor:pointer;" onclick="showPage('student')">
+          <div style="font-size:32px; margin-bottom:8px;">🍽️</div>
+          <div style="font-size:13px; font-weight:600; color:var(--dark);">Food</div>
+          <div style="font-size:11px; color:var(--gray-400); margin-top:2px;">Mess, quality, timing</div>
+        </div>
+        <div class="card" style="text-align:center; padding:20px 12px; cursor:pointer;" onclick="showPage('student')">
+          <div style="font-size:32px; margin-bottom:8px;">🧹</div>
+          <div style="font-size:13px; font-weight:600; color:var(--dark);">Cleanliness</div>
+          <div style="font-size:11px; color:var(--gray-400); margin-top:2px;">Hygiene, sanitation</div>
+        </div>
+        <div class="card" style="text-align:center; padding:20px 12px; cursor:pointer;" onclick="showPage('student')">
+          <div style="font-size:32px; margin-bottom:8px;">📶</div>
+          <div style="font-size:13px; font-weight:600; color:var(--dark);">Internet</div>
+          <div style="font-size:11px; color:var(--gray-400); margin-top:2px;">Wi-Fi, connectivity</div>
+        </div>
+        <div class="card" style="text-align:center; padding:20px 12px; cursor:pointer;" onclick="showPage('student')">
+          <div style="font-size:32px; margin-bottom:8px;">🪑</div>
+          <div style="font-size:13px; font-weight:600; color:var(--dark);">Furniture</div>
+          <div style="font-size:11px; color:var(--gray-400); margin-top:2px;">Beds, chairs, tables</div>
+        </div>
+        <div class="card" style="text-align:center; padding:20px 12px; cursor:pointer;" onclick="showPage('student')">
+          <div style="font-size:32px; margin-bottom:8px;">💧</div>
+          <div style="font-size:13px; font-weight:600; color:var(--dark);">Water Supply</div>
+          <div style="font-size:11px; color:var(--gray-400); margin-top:2px;">Hot water, supply</div>
+        </div>
+        <div class="card" style="text-align:center; padding:20px 12px; cursor:pointer;" onclick="showPage('student')">
+          <div style="font-size:32px; margin-bottom:8px;">📋</div>
+          <div style="font-size:13px; font-weight:600; color:var(--dark);">Other</div>
+          <div style="font-size:11px; color:var(--gray-400); margin-top:2px;">Any other issues</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- END HOME PAGE -->
+
+
+<!-- ================== PAGE: STUDENT ================== -->
+<div id="page-student" class="page">
+
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h2>📝 Register Complaint</h2>
+        <p>Fill in the form below to submit your hostel complaint</p>
+      </div>
+      <button class="btn btn-outline" onclick="showPage('track')">
+        <i class="fas fa-search"></i> Track Existing Complaint
+      </button>
+    </div>
+  </div>
+
+  <div class="container section">
+
+    <!-- Success Screen -->
+    <div id="success-screen" class="success-screen">
+      <div class="success-circle">✅</div>
+      <h2 style="font-size:24px; font-weight:700; color:var(--dark);">Complaint Submitted!</h2>
+      <p style="color:var(--gray-500); margin-top:8px; font-size:15px;">Your complaint has been registered successfully.</p>
+      <div class="success-id" id="generated-id">CMP-XXXX</div>
+      <p style="font-size:14px; color:var(--gray-500); margin-bottom:24px;">Save this Complaint ID to track your complaint status.</p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <button class="btn btn-primary btn-lg" id="submit-new-btn">
+          <i class="fas fa-plus"></i> Submit Another Complaint
+        </button>
+        <button class="btn btn-outline btn-lg" onclick="showPage('track')">
+          <i class="fas fa-search"></i> Track This Complaint
+        </button>
+      </div>
+    </div>
+
+    <!-- Complaint Form -->
+    <div id="complaint-form-wrapper" class="form-section">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏠 Student Complaint Form</div>
+          <span class="badge badge-pending">Required fields marked with <span style="color:var(--danger); font-size:14px;">*</span></span>
+        </div>
+
+        <form id="complaint-form">
+          <!-- Student Information -->
+          <div style="margin-bottom:24px;">
+            <div style="font-size:14px; font-weight:700; color:var(--primary); margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--primary-light);">
+              👤 Student Information
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="student-name">Full Name <span class="required">*</span></label>
+                <input type="text" id="student-name" class="form-control" placeholder="Enter your full name" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="mobile-number">Mobile Number <span class="required">*</span></label>
+                <input type="tel" id="mobile-number" class="form-control" placeholder="10-digit mobile number" pattern="[0-9]{10}" maxlength="10" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="room-number">Room Number <span class="required">*</span></label>
+                <input type="text" id="room-number" class="form-control" placeholder="e.g., A-101" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="hostel-block">Hostel Block <span class="required">*</span></label>
+                <select id="hostel-block" class="form-control" required>
+                  <option value="">-- Select Block --</option>
+                  <option value="Block A">Block A</option>
+                  <option value="Block B">Block B</option>
+                  <option value="Block C">Block C</option>
+                  <option value="Block D">Block D</option>
+                  <option value="Block E">Block E</option>
+                  <option value="New Wing">New Wing</option>
+                  <option value="Old Wing">Old Wing</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Complaint Details -->
+          <div style="margin-bottom:24px;">
+            <div style="font-size:14px; font-weight:700; color:var(--primary); margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--primary-light);">
+              📋 Complaint Details
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="complaint-type">Complaint Category <span class="required">*</span></label>
+                <select id="complaint-type" class="form-control" required>
+                  <option value="">-- Select Category --</option>
+                  <option value="Electrical Issue">⚡ Electrical Issue</option>
+                  <option value="Plumbing Issue">🚿 Plumbing Issue</option>
+                  <option value="Food Complaint">🍽️ Food Complaint</option>
+                  <option value="Cleanliness Issue">🧹 Cleanliness Issue</option>
+                  <option value="Internet/Wi-Fi Issue">📶 Internet/Wi-Fi Issue</option>
+                  <option value="Furniture Damage">🪑 Furniture Damage</option>
+                  <option value="Water Supply Issue">💧 Water Supply Issue</option>
+                  <option value="Security Issue">🔒 Security Issue</option>
+                  <option value="Noise Complaint">🔊 Noise Complaint</option>
+                  <option value="Laundry Issue">👕 Laundry Issue</option>
+                  <option value="Other">📋 Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="priority">Priority Level <span class="required">*</span></label>
+                <select id="priority" class="form-control" required>
+                  <option value="">-- Select Priority --</option>
+                  <option value="High">🔴 High — Urgent, affecting daily life</option>
+                  <option value="Medium">🟡 Medium — Needs attention soon</option>
+                  <option value="Low">🟢 Low — Can wait, minor issue</option>
+                </select>
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label" for="description">Complaint Description <span class="required">*</span></label>
+                <textarea id="description" class="form-control" rows="4"
+                  placeholder="Please describe your complaint in detail. Include when it started, how it affects you, and any other relevant information..." required></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image Upload -->
+          <div style="margin-bottom:28px;">
+            <div style="font-size:14px; font-weight:700; color:var(--primary); margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--primary-light);">
+              📸 Supporting Image (Optional)
+            </div>
+            <div class="file-upload-area" id="upload-area">
+              <input type="file" id="image-input" class="file-upload-input" accept="image/*" />
+              <div class="file-upload-icon">📷</div>
+              <div class="file-upload-text" id="upload-text">Click to upload or drag & drop an image</div>
+              <div class="file-upload-hint">Supports JPG, PNG, WEBP • Max 5MB</div>
+            </div>
+            <div class="file-preview" id="image-preview">
+              <img id="image-preview-img" src="" alt="Preview" />
+              <button type="button" class="btn btn-sm btn-secondary" style="margin-top:8px;" onclick="clearImage()">
+                ✕ Remove Image
+              </button>
+            </div>
+          </div>
+
+          <!-- Declaration -->
+          <div class="alert alert-info" style="margin-bottom:20px;">
+            <span>ℹ️</span>
+            <span>By submitting this form, you confirm that the information provided is accurate. A unique Complaint ID will be generated for tracking purposes.</span>
+          </div>
+
+          <!-- Submit Button -->
+          <div style="display:flex; justify-content:flex-end; gap:12px;">
+            <button type="button" class="btn btn-secondary btn-lg" onclick="document.getElementById('complaint-form').reset(); clearImage();">
+              <i class="fas fa-redo"></i> Reset Form
+            </button>
+            <button type="submit" id="submit-btn" class="btn btn-primary btn-lg">
+              <i class="fas fa-paper-plane"></i> Submit Complaint
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END STUDENT PAGE -->
+
+
+<!-- ================== PAGE: TRACK ================== -->
+<div id="page-track" class="page">
+
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h2>🔍 Track Complaint</h2>
+        <p>Enter your Complaint ID to check the current status</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container section">
+    <div class="track-section">
+      <h3 style="font-size:20px; font-weight:700; margin-bottom:6px;">Track Your Complaint</h3>
+      <p style="color:var(--gray-500); font-size:14px; margin-bottom:24px;">
+        Enter the Complaint ID you received after submitting your complaint (e.g., <code style="background:var(--gray-100); padding:2px 8px; border-radius:4px;">CMP-2024-1234</code>)
+      </p>
+
+      <div class="track-input-group">
+        <input type="text" id="track-input" class="form-control"
+          placeholder="Enter Complaint ID (e.g., CMP-2024-1234)"
+          style="font-size:15px; text-transform:uppercase;" />
+        <button class="btn btn-primary btn-lg" id="track-btn" onclick="trackComplaint()">
+          🔍 Search
+        </button>
+      </div>
+
+      <div id="track-result" class="complaint-tracker"></div>
+
+      <div style="margin-top:32px; padding-top:24px; border-top:1px solid var(--gray-100);">
+        <h4 style="font-size:14px; font-weight:700; color:var(--gray-600); margin-bottom:12px;">Status Guide:</h4>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <span class="badge badge-pending">🕐 Pending — Awaiting review</span>
+          <span class="badge badge-assigned">👤 Assigned — Staff assigned</span>
+          <span class="badge badge-progress">⚙️ In Progress — Work in progress</span>
+          <span class="badge badge-resolved">✅ Resolved — Issue fixed</span>
+        </div>
+      </div>
+
+      <!-- Quick test IDs -->
+      <div style="margin-top:20px; padding:16px; background:var(--gray-50); border-radius:8px;">
+        <div style="font-size:13px; font-weight:600; color:var(--gray-500); margin-bottom:10px;">🧪 Sample Complaint IDs to test:</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-sm btn-secondary" onclick="document.getElementById('track-input').value='CMP-2024-001'; trackComplaint();">CMP-2024-001</button>
+          <button class="btn btn-sm btn-secondary" onclick="document.getElementById('track-input').value='CMP-2024-002'; trackComplaint();">CMP-2024-002</button>
+          <button class="btn btn-sm btn-secondary" onclick="document.getElementById('track-input').value='CMP-2024-003'; trackComplaint();">CMP-2024-003</button>
+          <button class="btn btn-sm btn-secondary" onclick="document.getElementById('track-input').value='CMP-2024-004'; trackComplaint();">CMP-2024-004</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END TRACK PAGE -->
+
+
+<!-- ================== PAGE: WARDEN ================== -->
+<div id="page-warden" class="page">
+
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h2>🛡️ Warden Dashboard</h2>
+        <p>Manage student complaints and assign maintenance staff</p>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" id="refresh-warden-btn">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container section">
+
+    <!-- Stats Grid -->
+    <div class="stats-grid" style="margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-card-icon blue">📋</div>
+        <div>
+          <div class="stat-card-value" id="warden-total">0</div>
+          <div class="stat-card-label">Total Complaints</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon yellow">🕐</div>
+        <div>
+          <div class="stat-card-value" id="warden-pending">0</div>
+          <div class="stat-card-label">Pending</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon purple">⚙️</div>
+        <div>
+          <div class="stat-card-value" id="warden-progress">0</div>
+          <div class="stat-card-label">In Progress</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon green">✅</div>
+        <div>
+          <div class="stat-card-value" id="warden-resolved">0</div>
+          <div class="stat-card-label">Resolved</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <label><i class="fas fa-filter"></i> Filters:</label>
+      <div class="search-input-wrapper">
+        <span class="search-icon"><i class="fas fa-search"></i></span>
+        <input type="text" id="warden-search" class="form-control" placeholder="Search by name, room, complaint ID..." />
+      </div>
+      <select id="warden-status-filter" class="form-control">
+        <option value="">All Status</option>
+        <option value="Pending">🕐 Pending</option>
+        <option value="Assigned">👤 Assigned</option>
+        <option value="In Progress">⚙️ In Progress</option>
+        <option value="Resolved">✅ Resolved</option>
+      </select>
+      <select id="warden-type-filter" class="form-control">
+        <option value="">All Types</option>
+        <option value="Electrical Issue">⚡ Electrical</option>
+        <option value="Plumbing Issue">🚿 Plumbing</option>
+        <option value="Food Complaint">🍽️ Food</option>
+        <option value="Cleanliness Issue">🧹 Cleanliness</option>
+        <option value="Internet/Wi-Fi Issue">📶 Internet</option>
+        <option value="Furniture Damage">🪑 Furniture</option>
+        <option value="Water Supply Issue">💧 Water</option>
+        <option value="Other">📋 Other</option>
+      </select>
+    </div>
+
+    <!-- Complaints Table -->
+    <div class="card" style="padding:0; overflow:hidden;">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Complaint ID</th>
+              <th>Student</th>
+              <th>Issue Type</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Assigned To</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="warden-tbody">
+            <tr>
+              <td colspan="8" style="text-align:center; padding:40px; color:var(--gray-400);">
+                Loading complaints...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Staff List -->
+    <div class="card" style="margin-top:24px;">
+      <div class="card-header">
+        <div class="card-title">👷 Available Maintenance Staff</div>
+        <button class="btn btn-sm btn-secondary" onclick="loadStaff()"><i class="fas fa-sync-alt"></i></button>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px;" id="staff-cards">
+        <!-- Loaded dynamically -->
+        <div style="text-align:center; padding:20px; color:var(--gray-400);">Loading staff...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- END WARDEN PAGE -->
+
+
+<!-- ================== PAGE: ADMIN ================== -->
+<div id="page-admin" class="page">
+
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h2>📊 Administrator Dashboard</h2>
+        <p>Monitor complaint analytics and export data to Excel</p>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-secondary" onclick="loadAdminData()">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+        <button id="export-btn" class="btn btn-success" onclick="exportToExcel()">
+          <i class="fas fa-file-excel"></i> Export to Excel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container section">
+
+    <!-- Stats Cards -->
+    <div class="stats-grid" style="grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));">
+      <div class="stat-card">
+        <div class="stat-card-icon blue">📋</div>
+        <div>
+          <div class="stat-card-value" id="admin-total">0</div>
+          <div class="stat-card-label">Total Complaints</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon yellow">🕐</div>
+        <div>
+          <div class="stat-card-value" id="admin-pending">0</div>
+          <div class="stat-card-label">Pending</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon purple">⚙️</div>
+        <div>
+          <div class="stat-card-value" id="admin-progress">0</div>
+          <div class="stat-card-label">In Progress</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon green">✅</div>
+        <div>
+          <div class="stat-card-value" id="admin-resolved">0</div>
+          <div class="stat-card-label">Resolved</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon red">🔴</div>
+        <div>
+          <div class="stat-card-value" id="admin-high">0</div>
+          <div class="stat-card-label">High Priority</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon cyan">📈</div>
+        <div>
+          <div class="stat-card-value" id="admin-rate">0%</div>
+          <div class="stat-card-label">Resolution Rate</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" id="admin-tab-analytics" onclick="switchAdminTab('analytics')">
+        <i class="fas fa-chart-pie"></i> Analytics
+      </button>
+      <button class="tab-btn" id="admin-tab-complaints" onclick="switchAdminTab('complaints')">
+        <i class="fas fa-list"></i> All Complaints
+      </button>
+      <button class="tab-btn" id="admin-tab-staff" onclick="switchAdminTab('staff')">
+        <i class="fas fa-users"></i> Staff Management
+      </button>
+    </div>
+
+    <!-- Tab: Analytics -->
+    <div class="tab-content active" id="admin-content-analytics">
+      <div class="charts-grid">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📊 Complaint Status</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="status-chart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🗂️ By Category</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="type-chart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚡ Priority Distribution</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="priority-chart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📈 Monthly Trend</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="trend-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: All Complaints -->
+    <div class="tab-content" id="admin-content-complaints">
+      <div class="filter-bar">
+        <div class="search-input-wrapper">
+          <span class="search-icon"><i class="fas fa-search"></i></span>
+          <input type="text" id="admin-search-input" class="form-control" placeholder="Search complaints..." />
+        </div>
+        <select id="admin-status-filter" class="form-control">
+          <option value="">All Status</option>
+          <option value="pending">🕐 Pending</option>
+          <option value="assigned">👤 Assigned</option>
+          <option value="in progress">⚙️ In Progress</option>
+          <option value="resolved">✅ Resolved</option>
+        </select>
+        <button class="btn btn-success" onclick="exportToExcel()">
+          <i class="fas fa-file-excel"></i> Export to Excel
+        </button>
+      </div>
+
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Complaint ID</th>
+                <th>Student Name</th>
+                <th>Room</th>
+                <th>Issue Type</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="admin-complaints-tbody">
+              <tr><td colspan="7" style="text-align:center; padding:40px; color:var(--gray-400);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Staff Management -->
+    <div class="tab-content" id="admin-content-staff">
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header">
+          <div class="card-title">👷 Maintenance Staff Directory</div>
+        </div>
+        <div id="admin-staff-table-wrapper">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Staff Name</th>
+                  <th>Role</th>
+                  <th>Department</th>
+                  <th>Contact</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="admin-staff-tbody">
+                <tr><td colspan="6" style="text-align:center; padding:30px; color:var(--gray-400);">Loading staff...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- END ADMIN PAGE -->
+
+
+<!-- ================== MODALS ================== -->
+
+<!-- Warden Update Modal -->
+<div class="modal-overlay" id="warden-modal">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header">
+      <h3 class="modal-title">⚙️ Manage Complaint — <span id="modal-complaint-id" style="color:var(--primary);"></span></h3>
+      <button class="modal-close" onclick="closeModal('warden-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="padding:14px; background:var(--gray-50); border-radius:8px; margin-bottom:20px;">
+        <div style="font-size:13px; font-weight:600; color:var(--gray-500); margin-bottom:4px;">Student</div>
+        <div style="font-weight:600;" id="modal-student">—</div>
+        <div style="font-size:13px; color:var(--gray-500); margin-top:4px;" id="modal-type">—</div>
+        <div style="font-size:13px; color:var(--gray-400); margin-top:8px;" id="modal-description">—</div>
+        <div style="font-size:12px; color:var(--gray-300); margin-top:8px;" id="modal-date">—</div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Update Status</label>
+          <select id="modal-status-select" class="form-control">
+            <option value="Pending">🕐 Pending</option>
+            <option value="Assigned">👤 Assigned</option>
+            <option value="In Progress">⚙️ In Progress</option>
+            <option value="Resolved">✅ Resolved</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Assign Staff</label>
+          <select id="modal-staff-select" class="form-control staff-select">
+            <option value="">-- Select Staff --</option>
+          </select>
+        </div>
+        <div class="form-group full-width">
+          <label class="form-label">Warden Remarks</label>
+          <textarea id="modal-remarks" class="form-control" rows="3"
+            placeholder="Add remarks or updates about this complaint..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('warden-modal')">Cancel</button>
+      <button class="btn btn-primary" id="save-update-btn" onclick="saveWardenUpdate()">
+        💾 Save Update
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail View Modal -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">📋 Complaint Details — <span id="detail-modal-title" style="color:var(--primary);"></span></h3>
+      <button class="modal-close" onclick="closeModal('detail-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="detail-body">
+      <!-- Filled dynamically -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('detail-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<!-- ================== FOOTER ================== -->
+<footer>
+  <strong>HostelCare — Hostel Complaint Management System</strong><br>
+  Designed for efficient hostel facility management • All data stored securely
+</footer>
+
+<!-- ================== SCRIPTS ================== -->
+<script src="js/app.js"></script>
+<script>
+  // ===== Staff Cards Render =====
+  const _loadStaffOrig = loadStaff;
+  loadStaff = async function() {
+    await _loadStaffOrig();
+    renderStaffCards();
+    renderAdminStaffTable();
+  };
+
+  function renderStaffCards() {
+    const container = document.getElementById('staff-cards');
+    if (!container || !STATE.staff.length) return;
+    container.innerHTML = STATE.staff.map(s => `
+      <div style="padding:14px; border-radius:10px; border:1.5px solid ${s.available ? 'var(--success)' : 'var(--gray-200)'}; background:${s.available ? 'var(--success-light)' : 'var(--gray-50)'};">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+          <div style="width:36px; height:36px; border-radius:50%; background:${s.available ? 'var(--success)' : 'var(--gray-300)'}; color:white; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">
+            ${s.role.includes('Electri') ? '⚡' : s.role.includes('Plumb') ? '🚿' : s.role.includes('Clean') ? '🧹' : s.role.includes('Carpen') ? '🪑' : s.role.includes('Network') ? '📶' : '🔧'}
+          </div>
+          <div>
+            <div style="font-weight:700; font-size:13px;">${s.name}</div>
+            <div style="font-size:11px; color:var(--gray-500);">${s.role}</div>
+          </div>
+        </div>
+        <div style="font-size:11px; color:var(--gray-500);">📞 ${s.contact}</div>
+        <div style="margin-top:6px;">
+          <span class="badge ${s.available ? 'badge-resolved' : 'badge-pending'}" style="font-size:10px;">
+            ${s.available ? '✅ Available' : '🕐 Busy'}
+          </span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderAdminStaffTable() {
+    const tbody = document.getElementById('admin-staff-tbody');
+    if (!tbody || !STATE.staff.length) return;
+    tbody.innerHTML = STATE.staff.map((s, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td style="font-weight:600;">${s.name}</td>
+        <td>${s.role}</td>
+        <td>${s.department}</td>
+        <td style="font-size:13px;">📞 ${s.contact}</td>
+        <td><span class="badge ${s.available ? 'badge-resolved' : 'badge-pending'}">${s.available ? '✅ Available' : '🕐 Busy'}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  // ===== Clear Image =====
+  function clearImage() {
+    document.getElementById('image-input').value = '';
+    document.getElementById('image-preview').style.display = 'none';
+    document.getElementById('image-preview-img').src = '';
+    document.getElementById('upload-text').textContent = 'Click to upload or drag & drop an image';
+  }
+
+  // ===== Load warden page immediately if needed =====
+  window.addEventListener('load', () => {
+    loadHomeStats();
+    loadStaff();
+  });
+</script>
+</body>
+</html>
