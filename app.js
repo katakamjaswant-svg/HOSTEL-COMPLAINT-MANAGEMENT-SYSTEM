@@ -48,31 +48,79 @@ document.querySelector('.hamburger').addEventListener('click', () => {
   document.querySelector('.navbar-nav').classList.toggle('open');
 });
 
-// ============ API HELPERS ============
+// ============ LOCAL DATA STORE (localStorage-backed) ============
+const DB_KEYS = { complaints: 'hcms_complaints', staff: 'hcms_staff' };
+
+const DEFAULT_STAFF = [
+  { id: 'staff-1', name: 'Ramesh Kumar', role: 'Electrician', department: 'Maintenance', contact: '9876543210', available: true },
+  { id: 'staff-2', name: 'Suresh Babu', role: 'Plumber', department: 'Maintenance', contact: '9876543211', available: true },
+  { id: 'staff-3', name: 'Lakshmi Devi', role: 'Housekeeping Supervisor', department: 'Housekeeping', contact: '9876543212', available: true },
+  { id: 'staff-4', name: 'Anil Sharma', role: 'Network Technician', department: 'IT Support', contact: '9876543213', available: false },
+  { id: 'staff-5', name: 'Venkat Rao', role: 'Carpenter', department: 'Maintenance', contact: '9876543214', available: true },
+  { id: 'staff-6', name: 'Priya Nair', role: 'Mess Supervisor', department: 'Food Services', contact: '9876543215', available: true },
+];
+
+function dbRead(table) {
+  try {
+    const raw = localStorage.getItem(DB_KEYS[table]);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { console.error('DB read error:', e); }
+  return null;
+}
+
+function dbWrite(table, records) {
+  localStorage.setItem(DB_KEYS[table], JSON.stringify(records));
+}
+
+function dbInit() {
+  if (!dbRead('staff')) dbWrite('staff', DEFAULT_STAFF);
+  if (!dbRead('complaints')) dbWrite('complaints', []);
+}
+dbInit();
+
+function parseTableUrl(url) {
+  const [path, query] = url.split('?');
+  const parts = path.replace(/^tables\//, '').split('/');
+  const params = new URLSearchParams(query || '');
+  return { table: parts[0], id: parts[1] || null, params };
+}
+
 async function apiGet(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`GET ${url} failed: ${res.status}`);
-  return res.json();
+  const { table, id, params } = parseTableUrl(url);
+  let records = dbRead(table) || [];
+  if (id) {
+    const found = records.find(r => r.id === id);
+    if (!found) throw new Error(`GET ${url} failed: 404`);
+    return found;
+  }
+  const search = (params.get('search') || '').toLowerCase();
+  if (search) {
+    records = records.filter(r =>
+      Object.values(r).some(v => String(v).toLowerCase().includes(search))
+    );
+  }
+  const limit = parseInt(params.get('limit')) || records.length;
+  return { data: records.slice(0, limit), total: records.length };
 }
 
 async function apiPost(url, data) {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-  if (!res.ok) throw new Error(`POST ${url} failed: ${res.status}`);
-  return res.json();
+  const { table } = parseTableUrl(url);
+  const records = dbRead(table) || [];
+  const now = Date.now();
+  const record = { id: `rec-${now}-${Math.floor(Math.random() * 100000)}`, created_at: now, updated_at: now, ...data };
+  records.unshift(record);
+  dbWrite(table, records);
+  return record;
 }
 
 async function apiPatch(url, data) {
-  const res = await fetch(url, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-  if (!res.ok) throw new Error(`PATCH ${url} failed: ${res.status}`);
-  return res.json();
+  const { table, id } = parseTableUrl(url);
+  const records = dbRead(table) || [];
+  const idx = records.findIndex(r => r.id === id);
+  if (idx === -1) throw new Error(`PATCH ${url} failed: 404`);
+  records[idx] = { ...records[idx], ...data, updated_at: Date.now() };
+  dbWrite(table, records);
+  return records[idx];
 }
 
 // ============ GENERATE COMPLAINT ID ============
